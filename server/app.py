@@ -35,7 +35,6 @@ def messages():
 @app.route("/messages/<int:id>", methods=["GET", "PATCH", "DELETE"])
 def messages_by_id(id):
     message = db.session.get(Message, id)
-    # message = Message.query.filter_by(id=id).first()
 
     if request.method == "GET":
         return message, 200
