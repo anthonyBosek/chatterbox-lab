@@ -18,13 +18,16 @@ db.init_app(app)
 @app.route("/messages", methods=["GET", "POST"])
 def messages():
     if request.method == "GET":
+        # add try / except
         messages = Message.query.order_by("created_at").all()
 
         return [message.to_dict() for message in messages], 200
 
     else:
+        # add try / except
         req_data = request.get_json()
-        message = Message(body=req_data["body"], username=req_data["username"])
+        message = Message(**req_data)
+        # message = Message(body=req_data["body"], username=req_data["username"])
 
         db.session.add(message)
         db.session.commit()
@@ -34,6 +37,20 @@ def messages():
 
 @app.route("/messages/<int:id>", methods=["GET", "PATCH", "DELETE"])
 def messages_by_id(id):
+    # partial class solution
+    # if request.method == "PATCH":
+    #     try:
+    #         req_data = request.get_json()
+    #         if message := db.session.get(Message, id):
+    #             for k, v in req_data.items:
+    #                 setattr(message, k, v)
+    #             db.session.commit()
+    #             return message.to_dict(), 200
+    #         return {"error": f""}, 404
+    #     except:
+    #         return {"error": ""}, 422
+
+    # mine
     message = db.session.get(Message, id)
 
     if request.method == "GET":
@@ -53,7 +70,7 @@ def messages_by_id(id):
         db.session.delete(message)
         db.session.commit()
 
-        return {"message": f"Message id#{message.id} was deleted."}, 200
+        return {"message": f"Message id#{message.id} was deleted."}, 204
 
 
 if __name__ == "__main__":
